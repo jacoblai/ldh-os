@@ -1,9 +1,10 @@
 #!/bin/bash
 
 # 构建配置
-KERNEL_SOURCE="$(pwd)/kernel"
-BUILD_DIR="$(pwd)/build/output"
-TOOLCHAIN_DIR="$(pwd)/build/toolchain"
+PROJECT_ROOT="$(pwd)"
+KERNEL_SOURCE="$PROJECT_ROOT/kernel"
+BUILD_DIR="$PROJECT_ROOT/build/output"
+TOOLCHAIN_DIR="$PROJECT_ROOT/build/toolchain"
 
 # 创建必要目录
 mkdir -p "$BUILD_DIR"
@@ -11,15 +12,19 @@ mkdir -p "$TOOLCHAIN_DIR"
 
 # 构建内核
 build_kernel() {
-    cd "$KERNEL_SOURCE"
+    echo "Building kernel..."
+    cd "$KERNEL_SOURCE" || exit 1
     make defconfig
     make -j$(nproc)
+    cd "$PROJECT_ROOT" || exit 1
 }
 
 # 构建Init系统
 build_init() {
-    cd "$(pwd)/init"
+    echo "Building init system..."
+    cd "$PROJECT_ROOT/init" || exit 1
     go build -o "$BUILD_DIR/init"
+    cd "$PROJECT_ROOT" || exit 1
 }
 
 # 主构建流程

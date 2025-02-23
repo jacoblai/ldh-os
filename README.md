@@ -98,16 +98,31 @@ sudo apt install -y build-essential gcc g++ gdb make cmake ninja-build \
     libssl-dev libelf-dev bc
 ```
 
+### 克隆项目
+```bash
+git clone https://github.com/jacoblai/ldh-os.git ldh-os
+cd ldh-os
+```
+
 ## linux内核下载
 ```bash
 # 克隆Linux内核
 git clone --depth 1 https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git kernel
 ```
 
-### 克隆项目
+## 执行构建和测试
 ```bash
-git clone https://github.com/jacoblai/ldh-os.git ldh-os
-cd ldh-os
+# 构建init系统
+cd init && go build -o ../build/output/init && cd ..
+
+# 构建系统
+./build/build.sh
+
+# 创建initramfs
+./build/create_initramfs.sh
+
+# 运行测试
+./build/test.sh
 ```
 
 ### 目前已实现的功能
