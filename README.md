@@ -8,6 +8,7 @@ LDH-OS是一个基于Linux内核的实验性操作系统，旨在构建一个以
 - [x] 自定义Init系统（基础功能）
 - [x] 基本文件系统挂载
 - [x] 信号处理机制
+- [x] 服务管理功能
 - [ ] LLM集成
 - [ ] MCP协议实现
 - [ ] 系统服务管理
@@ -17,6 +18,9 @@ LDH-OS是一个基于Linux内核的实验性操作系统，旨在构建一个以
 Linux Kernel
 |
 Custom Init System
+    ├── Service Manager
+    ├── Event System
+    └── MCP Handler (计划中)
 |
 LLM Agent System (计划中)
 |
@@ -28,6 +32,9 @@ Essential System Services
 ldh-os/
 ├── kernel/          # Linux内核源码
 ├── init/            # Init系统实现
+│   ├── service/    # 服务管理模块
+│   ├── config/     # 配置文件
+│   └── main.go     # 主程序
 ├── llm/             # LLM相关实现（计划中）
 │   ├── models/     # 模型文件目录
 │   ├── data/       # 数据目录
@@ -138,13 +145,28 @@ cd init && go build -o ../build/output/init && cd ..
     - initramfs生成
     - QEMU测试环境
 
+3. 服务管理系统
+    - 服务生命周期管理（启动、停止、重启）
+    - 服务状态监控和事件系统
+    - 服务依赖关系管理
+    - 配置文件支持（YAML格式）
+    - MCP协议集成准备
+    - 支持多种服务类型：
+        - daemon: 持续运行的服务
+        - oneshot: 一次性执行的服务
+        - periodic: 周期性执行的服务
+    - 自动重启策略：
+        - always: 总是重启
+        - never: 从不重启
+        - on-failure: 失败时重启
+
 ## 开发路线图
 
 ### Phase 1 - 当前阶段
 - [x] 配置精简Linux内核
 - [x] 实现基础Init系统
 - [x] 构建最小文件系统
-- [ ] 完善服务管理功能
+- [x] 完善服务管理功能
 
 ### Phase 2 - 计划中
 - [ ] 集成llama.cpp
@@ -156,6 +178,33 @@ cd init && go build -o ../build/output/init && cd ..
 - [ ] 集成图数据库
 - [ ] 实现扩展系统功能
 
+## 服务配置示例
+```yaml
+# 基础系统服务
+syslog:
+  description: "System logging service"
+  type: "daemon"
+  exec: "/usr/sbin/syslogd"
+  restart: "always"
+  mcp:
+    functions: ["start", "stop", "restart", "status"]
+    permissions: ["read", "write"]
+
+# 带依赖的服务
+monitoring:
+  description: "System monitoring service"
+  type: "daemon"
+  exec: "/usr/local/bin/monitor"
+  environment:
+    MONITOR_INTERVAL: "60"
+    LOG_LEVEL: "info"
+  dependencies: ["syslog"]
+  restart: "always"
+  mcp:
+    functions: ["start", "stop", "restart", "status", "get_metrics"]
+    permissions: ["read", "write", "execute"]
+```
+
 ## 调试指南
 
 ### QEMU调试
@@ -166,6 +215,12 @@ cd init && go build -o ../build/output/init && cd ..
 
 ### 日志查看
 Init系统的日志直接输出到控制台，可以通过QEMU串口查看。
+
+### 服务管理调试
+服务状态可以通过以下方式查看：
+1. 系统日志
+2. MCP协议接口
+3. 服务状态文件
 
 ## 贡献指南
 1. Fork 项目

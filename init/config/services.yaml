@@ -1,0 +1,60 @@
+# LDH-OS 服务配置文件
+# 系统基础服务
+syslog:
+  description: "System logging service"
+  type: "daemon"
+  exec: "/usr/sbin/syslogd"
+  restart: "always"
+  mcp:
+    functions: ["start", "stop", "restart", "status"]
+    permissions: ["read", "write"]
+
+cron:
+  description: "Cron daemon"
+  type: "daemon"
+  exec: "/usr/sbin/crond"
+  args: ["-n"]
+  dependencies: ["syslog"]
+  restart: "always"
+  mcp:
+    functions: ["start", "stop", "restart", "status"]
+    permissions: ["read", "write"]
+
+# 网络服务
+dhcpcd:
+  description: "DHCP Client Daemon"
+  type: "daemon"
+  exec: "/usr/sbin/dhcpcd"
+  args: ["-B"]
+  restart: "on-failure"
+  mcp:
+    functions: ["start", "stop", "restart", "status"]
+    permissions: ["read", "write"]
+
+# 系统监控服务
+monitoring:
+  description: "System monitoring service"
+  type: "daemon"
+  exec: "/usr/local/bin/monitor"
+  environment:
+    MONITOR_INTERVAL: "60"
+    LOG_LEVEL: "info"
+  dependencies: ["syslog"]
+  restart: "always"
+  mcp:
+    functions: ["start", "stop", "restart", "status", "get_metrics"]
+    permissions: ["read", "write", "execute"]
+
+# LLM 相关服务
+llm-agent:
+  description: "LLM Agent Service"
+  type: "daemon"
+  exec: "/usr/local/bin/llm-agent"
+  environment:
+    MODEL_PATH: "/opt/ldh-os/models"
+    API_PORT: "8080"
+  dependencies: ["monitoring"]
+  restart: "always"
+  mcp:
+    functions: ["start", "stop", "restart", "status", "reload_model"]
+    permissions: ["read", "write", "execute"] 
