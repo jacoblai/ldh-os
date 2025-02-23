@@ -62,35 +62,6 @@ ldh-os/
 - bc
 ```
 
-```
-# Ubuntu/Debian系统
-sudo apt update
-sudo apt install -y \
-    build-essential \
-    gcc \
-    g++ \
-    gdb \
-    make \
-    cmake \
-    ninja-build \
-    git \
-    golang \
-    python3 \
-    python3-pip \
-    qemu-system-x86 \
-    bison \
-    flex \
-    libssl-dev \
-    libelf-dev \
-    bc
-```
-
-## linux内核下载
-```bash
-# 克隆Linux内核
-git clone --depth 1 https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git kernel
-```
-
 ## 构建说明
 
 ### 1. 编译内核
@@ -127,9 +98,15 @@ sudo apt install -y build-essential gcc g++ gdb make cmake ninja-build \
     libssl-dev libelf-dev bc
 ```
 
+## linux内核下载
+```bash
+# 克隆Linux内核
+git clone --depth 1 https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git kernel
+```
+
 ### 克隆项目
 ```bash
-git clone [repository-url] ldh-os
+git clone https://github.com/jacoblai/ldh-os.git ldh-os
 cd ldh-os
 ```
 
