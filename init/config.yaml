@@ -1,0 +1,19 @@
+build:
+  kernel:
+    config_path: "kernel/config"
+    output_path: "build/output/kernel"
+  
+  init:
+    source_path: "init"
+    output_path: "build/output/init"
+    
+  llm:
+    model_path: "llm/models"
+    config_path: "llm/config"
+    
+development:
+  debug: true
+  qemu:
+    enable: true
+    memory: "2G"
+    cores: 2
