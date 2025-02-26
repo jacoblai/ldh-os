@@ -71,32 +71,7 @@ ldh-os/
 
 ## 构建说明
 
-### 1. 编译内核
-```bash
-cd kernel
-make defconfig
-make -j$(nproc)
-```
-
-### 2. 编译Init系统
-```bash
-cd init
-go build -o ../build/output/init
-```
-
-### 3. 创建initramfs
-```bash
-./build/create_initramfs.sh
-```
-
-### 4. 运行测试
-```bash
-./build/test.sh
-```
-
-## 开发指南
-
-### 设置开发环境
+### 1.设置开发环境
 ```bash
 # 安装依赖
 sudo apt update
@@ -105,31 +80,56 @@ sudo apt install -y build-essential gcc g++ gdb make cmake ninja-build \
     libssl-dev libelf-dev bc
 ```
 
-### 克隆项目
+### 2.克隆项目
 ```bash
 git clone https://github.com/jacoblai/ldh-os.git ldh-os
 cd ldh-os
 ```
 
-## linux内核下载
-```bash
-# 克隆Linux内核
-git clone --depth 1 https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git kernel
-```
-
-## 执行构建和测试
+### 3. 构建系统
 ```bash
 # 构建init系统
 cd init && go build -o ../build/output/init && cd ..
 
-# 构建系统
+# 构建所有内容（内核、init系统、llama.cpp）
 ./build/build.sh
 
+# 更新特定组件
+./build/build.sh update-llama  # 更新llama.cpp源码
+./build/build.sh update-kernel # 更新内核源码
+
+# 清理构建
+./build/build.sh clean        # 清理构建目录
+./build/build.sh clean-all    # 清理所有内容（包括源码）
+
+# 显示帮助
+./build/build.sh help
+```
+
+## 4.执行构建和测试
+```bash
 # 创建initramfs
 ./build/create_initramfs.sh
 
 # 运行测试
 ./build/test.sh
+```
+
+### 清理系统
+```bash
+# 基本清理（构建输出和initramfs）
+./build/clean.sh
+
+# 清理特定组件
+./build/clean.sh kernel      # 清理内核构建文件
+./build/clean.sh third-party # 清理第三方库
+./build/clean.sh initramfs   # 清理initramfs文件
+
+# 清理所有内容
+./build/clean.sh all
+
+# 显示帮助
+./build/clean.sh help
 ```
 
 ### 目前已实现的功能
@@ -212,6 +212,19 @@ monitoring:
 - 内存: 2GB
 - CPU核心: 2
 - 控制台: ttyS0
+
+测试脚本 (`build/test.sh`) 已添加以下改进：
+- 支持通过 Ctrl+C 正常退出QEMU
+- 进程跟踪和自动清理机制
+- 强制终止保护（如果正常退出失败）
+
+如果QEMU进程无法正常退出：
+1. 首先尝试 Ctrl+C 正常退出
+2. 如果卡住，再次按 Ctrl+C，脚本会尝试强制终止
+3. 最后可以在另一个终端中执行：
+   ```bash
+   kill -9 $(cat /tmp/ldh-os-qemu.pid)
+   ```
 
 ### 日志查看
 Init系统的日志直接输出到控制台，可以通过QEMU串口查看。
